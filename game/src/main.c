@@ -54,7 +54,7 @@ int main(void)
 
 	CloseWindow();
 
-	free(bodies);
+	while (bodies) DestroyBody(bodies);
 
 	return 0;
 }
