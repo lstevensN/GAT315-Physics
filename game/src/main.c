@@ -1,4 +1,5 @@
 #include "body.h"
+#include "world.h"
 #include "raylib.h"
 #include <stdlib.h>
 #include <raymath.h>
@@ -11,11 +12,6 @@ int main(void)
 	InitWindow(1200, 720, "Physics Engine");
 	SetTargetFPS(60);
 
-	Body* bodies = (Body*)malloc(sizeof(Body) * MAX_BODIES);
-	assert(bodies);
-
-	int bodyCount = 0;
-
 	// game loop
 	while (!WindowShouldClose())
 	{
@@ -26,9 +22,10 @@ int main(void)
 		Vector2 position = GetMousePosition();
 		if (IsMouseButtonDown(0))
 		{
-			bodies[bodyCount].position = position;
-			bodies[bodyCount].velocity = CreateVector2(GetRandomFloatValue(-5, 5), GetRandomFloatValue(-5, 5));
-			bodyCount++;
+			Body* body = CreateBody();
+
+			body->position = position;
+			body->velocity = CreateVector2(GetRandomFloatValue(-5, 5), GetRandomFloatValue(-5, 5));
 		}
 
 		// render
@@ -41,11 +38,15 @@ int main(void)
 
 		DrawCircle((int)position.x, (int)position.y, 20, YELLOW);
 
+		Body* body = bodies;
+
 		// update bodies
-		for (int i = 0; i < bodyCount; i++)
+		while (body)
 		{
-			bodies[i].position = Vector2Add(bodies[i].position, bodies[i].velocity);
-			DrawCircle((int)bodies[i].position.x, (int)bodies[i].position.y, 10, RED);
+			body->position = Vector2Add(body->position, body->velocity);
+			DrawCircle((int)body->position.x, (int)body->position.y, 10, RED);
+
+			body = body->next;
 		}
 
 		EndDrawing();
