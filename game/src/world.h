@@ -1,8 +1,11 @@
 #pragma once
-#include "body.h"
+#include "raylib.h"
 
-extern Body* bodies;
-extern int bodyCount;
+typedef struct ncBody ncBody;
 
-Body* CreateBody();
-void DestroyBody(Body* body);
+extern ncBody* ncBodies;
+extern int ncBodyCount;
+extern Vector2 ncGravity;
+
+ncBody* CreateBody();
+void DestroyBody(ncBody* body);

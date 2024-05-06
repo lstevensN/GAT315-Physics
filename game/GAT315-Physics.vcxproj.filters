@@ -15,6 +15,12 @@
     <ClCompile Include="src\world.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\integrator.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\body.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\body.h">

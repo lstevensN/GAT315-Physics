@@ -1,8 +1,12 @@
 #include "body.h"
+#include "mathf.h"
+#include "integrator.h"
 #include "world.h"
-#include "raylib.h"
+
+#include <raylib.h>
+#include "raymath.h"
+
 #include <stdlib.h>
-#include <raymath.h>
 #include <assert.h>
 
 #define MAX_BODIES 1000
@@ -11,6 +15,9 @@ int main(void)
 {
 	InitWindow(1200, 720, "Physics Engine");
 	SetTargetFPS(60);
+
+	// initialize world
+	ncGravity = (Vector2){ 0, 30 };
 
 	// game loop
 	while (!WindowShouldClose())
@@ -22,10 +29,31 @@ int main(void)
 		Vector2 position = GetMousePosition();
 		if (IsMouseButtonDown(0))
 		{
-			Body* body = CreateBody();
+			ncBody* body = CreateBody();
 
 			body->position = position;
-			body->velocity = CreateVector2(GetRandomFloatValue(-5, 5), GetRandomFloatValue(-5, 5));
+			body->mass = GetRandomFloatValue(1, 10);
+			body->inverseMass = 1 / body->mass;
+			body->type = BT_DYNAMIC;
+			body->damping = 0.5f;
+			body->gravityScale = 5;
+			ApplyForce(body, (Vector2) { GetRandomFloatValue(-200, 200), GetRandomFloatValue(-200, 200) }, FM_VELOCITY);
+		}
+
+		// apply force
+		ncBody* body = ncBodies;
+		while (body)
+		{
+			// ApplyForce(body, CreateVector2(0, -100), FM_FORCE);
+			body = body->next;
+		}
+
+		// update bodies
+		body = ncBodies;
+		while (body)
+		{
+			Step(body, dt);
+			body = body->next;
 		}
 
 		// render
@@ -38,14 +66,11 @@ int main(void)
 
 		DrawCircle((int)position.x, (int)position.y, 20, YELLOW);
 
-		Body* body = bodies;
-
-		// update bodies
+		// draw bodies
+		body = ncBodies;
 		while (body)
 		{
-			body->position = Vector2Add(body->position, body->velocity);
-			DrawCircle((int)body->position.x, (int)body->position.y, 10, RED);
-
+			DrawCircle((int)body->position.x, (int)body->position.y, body->mass, RED);
 			body = body->next;
 		}
 
@@ -54,7 +79,7 @@ int main(void)
 
 	CloseWindow();
 
-	while (bodies) DestroyBody(bodies);
+	while (ncBodies) DestroyBody(ncBodies);
 
 	return 0;
 }
