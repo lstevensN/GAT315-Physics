@@ -19,6 +19,8 @@ int main(void)
 	// initialize world
 	ncGravity = (Vector2){ 0, 30 };
 
+	HideCursor();
+
 	// game loop
 	while (!WindowShouldClose())
 	{
@@ -64,7 +66,7 @@ int main(void)
 		DrawText(TextFormat("FPS: %.2f (%.2fms)", fps, 1000 / fps), 10, 10, 20, LIME);
 		DrawText(TextFormat("FRAME: %.4f", dt), 10, 30, 20, LIME);
 
-		DrawCircle((int)position.x, (int)position.y, 20, YELLOW);
+		DrawCircle((int)position.x, (int)position.y, 5, YELLOW);
 
 		// draw bodies
 		body = ncBodies;
