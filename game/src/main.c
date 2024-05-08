@@ -2,6 +2,7 @@
 #include "mathf.h"
 #include "integrator.h"
 #include "world.h"
+#include "force.h"
 
 #include <raylib.h>
 #include "raymath.h"
@@ -15,11 +16,11 @@ int main(void)
 {
 	InitWindow(1200, 720, "Physics Engine");
 	SetTargetFPS(60);
+	HideCursor();
 
 	// initialize world
-	ncGravity = (Vector2){ 0, 30 };
-
-	HideCursor();
+	ncGravity = (Vector2){ 0, 0 };
+	int screenX = GetScreenWidth(), screenY = GetScreenHeight();
 
 	// game loop
 	while (!WindowShouldClose())
@@ -29,34 +30,37 @@ int main(void)
 		float fps = (float)GetFPS();
 
 		Vector2 position = GetMousePosition();
-		if (IsMouseButtonDown(0))
+		if (IsMouseButtonPressed(0))
 		{
-			ncBody* body = CreateBody();
+			float angle = GetRandomFloatValue(0, 360);
+			Color color = ColorFromHSV(GetRandomFloatValue(0, 360), 1, 1);
 
-			body->position = position;
-			body->mass = GetRandomFloatValue(1, 10);
-			body->inverseMass = 1 / body->mass;
-			body->type = BT_DYNAMIC;
-			body->damping = 0.5f;
-			body->gravityScale = 5;
-			ApplyForce(body, (Vector2) { GetRandomFloatValue(-200, 200), GetRandomFloatValue(-200, 200) }, FM_VELOCITY);
+			for (int i = 0; i < 100; i++)
+			{
+				ncBody* body = CreateBody();
+
+				body->position = position;
+				body->mass = GetRandomFloatValue(1, 10);
+				body->inverseMass = 1 / body->mass;
+				body->type = BT_DYNAMIC;
+				body->damping = 0.9f;
+				body->gravityScale = 5;
+				//body->color = color;
+				body->color = ColorFromHSV(GetRandomFloatValue(0, 360), 1, 1);
+
+				//Vector2 force = Vector2Scale(GetVector2FromAngle((-90 * GetRandomFloatValue(-30, 30)) * DEG2RAD), GetRandomFloatValue(1000, 2000));
+				//Vector2 force = Vector2Scale(GetVector2FromAngle((-30 + GetRandomFloatValue(-30, 30)) * DEG2RAD), GetRandomFloatValue(1000, 2000));
+				Vector2 force = Vector2Scale(GetVector2FromAngle((angle * GetRandomFloatValue(-30, 30)) * DEG2RAD), GetRandomFloatValue(1000, 2000));
+
+				ApplyForce(body, force, FM_IMPULSE);
+			}
 		}
 
 		// apply force
-		ncBody* body = ncBodies;
-		while (body)
-		{
-			// ApplyForce(body, CreateVector2(0, -100), FM_FORCE);
-			body = body->next;
-		}
+		ApplyGravitation(ncBodies, 30);
 
 		// update bodies
-		body = ncBodies;
-		while (body)
-		{
-			Step(body, dt);
-			body = body->next;
-		}
+		for (ncBody* body = ncBodies; body; body = body->next) Step(body, dt);
 
 		// render
 		BeginDrawing();
@@ -69,13 +73,13 @@ int main(void)
 		DrawCircle((int)position.x, (int)position.y, 5, YELLOW);
 
 		// draw bodies
-		body = ncBodies;
-		while (body)
+		for (ncBody* body = ncBodies; body; body = body->next)
 		{
-			DrawCircle((int)body->position.x, (int)body->position.y, body->mass, RED);
-			body = body->next;
-		}
+			/*if ((int)body->position.x < 0 || (int)body->position.x > screenX || (int)body->position.y < 0 || (int)body->position.y > screenY) { body = body->prev; DestroyBody(body->next); }
+			else DrawCircle((int)body->position.x, (int)body->position.y, body->mass, body->color);*/
 
+			DrawCircle((int)body->position.x, (int)body->position.y, body->mass, body->color);
+		}
 		EndDrawing();
 	}
 

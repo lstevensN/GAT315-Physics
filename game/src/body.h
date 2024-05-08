@@ -30,6 +30,8 @@ typedef struct ncBody
 	float inverseMass;  // 1 / mass (static = 0)
 	float gravityScale;
 	float damping;
+	
+	Color color;
 
 	struct ncBody* next;
 	struct ncBody* prev;
