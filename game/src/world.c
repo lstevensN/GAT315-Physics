@@ -9,12 +9,24 @@ ncBody* ncBodies = NULL;
 int ncBodyCount = 0;
 Vector2 ncGravity;
 
-ncBody* CreateBody()
+ncBody* CreateBody(Vector2 position, float mass, ncBodyType bodyType)
 {
 	ncBody* body = (ncBody*)malloc(sizeof(ncBody));
 	assert(body);
 
 	memset(body, 0, sizeof(ncBody));
+
+	body->position = position;
+	body->mass = mass;
+	body->inverseMass = (bodyType == BT_DYNAMIC) ? 1 / mass : 0;
+	body->type = bodyType;
+
+	return body;
+}
+
+void AddBody(ncBody* body)
+{
+	assert(body);
 
 	body->prev = NULL;
 	body->next = ncBodies;
@@ -23,8 +35,6 @@ ncBody* CreateBody()
 
 	ncBodies = body;
 	ncBodyCount++;
-
-	return body;
 }
 
 void DestroyBody(ncBody* body)
