@@ -25,8 +25,8 @@ int main(void)
 	SetTargetFPS(60);
 
 	// initialize world
-	ncGravity = (Vector2){ 0, -1 };
 	int screenX = GetScreenWidth(), screenY = GetScreenHeight();
+	ncScreenZoom = 10;
 
 	// game loop
 	while (!WindowShouldClose())
@@ -34,10 +34,11 @@ int main(void)
 		// update
 		float dt = GetFrameTime();
 		float fps = (float)GetFPS();
+		ncGravity = (Vector2){ 0, ncEditorData.GravityValue };
 
 		Vector2 position = GetMousePosition();
 		ncScreenZoom -= GetMouseWheelMove() * 0.2f;
-		ncScreenZoom = Clamp(ncScreenZoom, 0.1f, 10);
+		ncScreenZoom = Clamp(ncScreenZoom, 0.1f, 20);
 
 		UpdateEditor(position);
 
@@ -48,14 +49,14 @@ int main(void)
 			DrawCircleLines((int)screen.x, (int)screen.y, ConvertWorldToPixel(selectedBody->mass) + 5, YELLOW);
 		}
 
-		if (!ncEditorIntersect && IsMouseButtonDown(0))
+		if (!ncEditorIntersect && IsMouseButtonPressed(0))
 		{
 			float angle = GetRandomFloatValue(0, 360);
 			Color color = ColorFromHSV(GetRandomFloatValue(0, 360), 1, 1);
 
 			for (int i = 0; i < 1; i++)
 			{
-				ncBody* body = CreateBody(ConvertScreenToWorld(position), GetRandomFloatValue(ncEditorData.MassMinValue, ncEditorData.MassMaxValue), ncEditorData.BodyTypeActive);
+				ncBody* body = CreateBody(ConvertScreenToWorld(position), ncEditorData.MassValue, ncEditorData.BodyTypeActive);
 
 				body->damping = ncEditorData.DampingValue;
 				body->gravityScale = ncEditorData.GravityScaleValue;
@@ -71,7 +72,7 @@ int main(void)
 		{
 			if (selectedBody && selectedBody != connectBody)
 			{
-				auto spring = CreateSpring(connectBody, selectedBody, Vector2Distance(connectBody->position, selectedBody->position), 20);
+				ncSpring_t* spring = CreateSpring(connectBody, selectedBody, Vector2Distance(connectBody->position, selectedBody->position), 20);
 				AddSpring(spring);
 			}
 		}

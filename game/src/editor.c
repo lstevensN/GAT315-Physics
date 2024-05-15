@@ -20,13 +20,14 @@ void InitEditor()
 {
     GuiLoadStyle("raygui/styles/ashes/style_ashes.rgs");
 
-    ncEditorData.MassMinValue = 0.1f;
-    ncEditorData.MassMaxValue = 10;
+    ncEditorData.MassValue = 10;
     ncEditorData.GravitationValue = 2;
+    ncEditorData.GravityValue = -1;
     ncEditorData.BodyTypeEditMode = false;
     ncEditorData.BodyTypeActive = 0;
     ncEditorData.DampingValue = 0.0f;
-    ncEditorData.GravityScaleValue = 0.0f;
+    ncEditorData.GravityScaleValue = 1.0f;
+    ncEditorData.StiffnessValue = 0.0f;
 
     editorRect = (Rectangle){ anchor01.x + 0, anchor01.y + 0, 304, 616 };
 }
@@ -49,15 +50,16 @@ void DrawEditor()
         EditorBoxActive = !GuiWindowBox((Rectangle) { anchor01.x + 0, anchor01.y + 0, 304, 616 }, "Editor");
 
         GuiGroupBox((Rectangle) { anchor01.x + 10, anchor01.y + 40, 280, 270 }, "Body");
-        GuiSliderBar((Rectangle) { anchor01.x + 110, anchor01.y + 90, 150, 16 }, "Mass Min", NULL, & ncEditorData.MassMinValue, 0, 100);
-        GuiSliderBar((Rectangle) { anchor01.x + 110, anchor01.y + 130, 150, 16 }, "Mass Max", NULL, & ncEditorData.MassMaxValue, 0, 100);
-        GuiSliderBar((Rectangle) { anchor01.x + 110, anchor01.y + 170, 150, 16 }, "Damping", NULL, & ncEditorData.DampingValue, 0, 100);
-        GuiSliderBar((Rectangle) { anchor01.x + 110, anchor01.y + 210, 150, 16 }, "Gravity Scale", NULL, & ncEditorData.GravityScaleValue, 0, 100);
+        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 90, 150, 16 }, "Mass", TextFormat("%0.2f", ncEditorData.MassValue), & ncEditorData.MassValue, 0, 100);
+        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 130, 150, 16 }, "Damping", TextFormat("%0.2f", ncEditorData.DampingValue), & ncEditorData.DampingValue, 0, 100);
+        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 170, 150, 16 }, "Gravity Scale", TextFormat("%0.2f", ncEditorData.GravityScaleValue), & ncEditorData.GravityScaleValue, 1, 10);
+        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 210, 150, 16 }, "Stiffness", TextFormat("%0.2f", ncEditorData.StiffnessValue), & ncEditorData.StiffnessValue, 0, 100);
 
         GuiGroupBox((Rectangle) { anchor01.x + 10, anchor01.y + 320, 280, 270 }, "World");
-        GuiSliderBar((Rectangle) { anchor01.x + 110, anchor01.y + 340, 150, 16 }, "Gravitation", NULL, & ncEditorData.GravitationValue, 0, 100);
+        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 340, 150, 16 }, "Gravity", TextFormat("%0.2f", ncEditorData.GravityValue), & ncEditorData.GravityValue, -1, 100);
+        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 380, 150, 16 }, "Gravitation", TextFormat("%0.2f", ncEditorData.GravitationValue), & ncEditorData.GravitationValue, 0, 100);
 
-        if (GuiDropdownBox((Rectangle) { anchor01.x + 110, anchor01.y + 50, 150, 20 }, "DYNAMIC;KINEMATIC;STATIC", & ncEditorData.BodyTypeActive, ncEditorData.BodyTypeEditMode)) ncEditorData.BodyTypeEditMode = !ncEditorData.BodyTypeEditMode;
+        if (GuiDropdownBox((Rectangle) { anchor01.x + 100, anchor01.y + 50, 150, 20 }, "DYNAMIC;KINEMATIC;STATIC", & ncEditorData.BodyTypeActive, ncEditorData.BodyTypeEditMode)) ncEditorData.BodyTypeEditMode = !ncEditorData.BodyTypeEditMode;
     }
 
     GuiUnlock();

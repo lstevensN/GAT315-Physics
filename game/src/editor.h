@@ -3,13 +3,14 @@
 
 typedef struct ncEditorData
 {
-	float MassMinValue;
-	float MassMaxValue;
+	float MassValue;
+	float GravityValue;
 	float GravitationValue;
 	bool BodyTypeEditMode;
 	int BodyTypeActive;
 	float DampingValue;
 	float GravityScaleValue;
+	float StiffnessValue;
 } ncEditorData_t;
 
 extern ncEditorData_t ncEditorData;
