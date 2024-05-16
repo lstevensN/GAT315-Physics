@@ -266,6 +266,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\body.c" />
+    <ClCompile Include="src\collision.c" />
+    <ClCompile Include="src\contact.c" />
     <ClCompile Include="src\editor.c" />
     <ClCompile Include="src\force.c" />
     <ClCompile Include="src\integrator.h" />
@@ -281,6 +283,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\body.h" />
+    <ClInclude Include="src\collision.h" />
+    <ClInclude Include="src\contact.h" />
     <ClInclude Include="src\editor.h" />
     <ClInclude Include="src\force.h" />
     <ClInclude Include="src\mathf.h" />

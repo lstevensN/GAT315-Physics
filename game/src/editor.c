@@ -22,7 +22,7 @@ void InitEditor()
 
     ncEditorData.MassValue = 10;
     ncEditorData.GravitationValue = 2;
-    ncEditorData.GravityValue = -1;
+    ncEditorData.GravityValue = -10;
     ncEditorData.BodyTypeEditMode = false;
     ncEditorData.BodyTypeActive = 0;
     ncEditorData.DampingValue = 0.0f;
@@ -56,7 +56,7 @@ void DrawEditor()
         GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 210, 150, 16 }, "Stiffness", TextFormat("%0.2f", ncEditorData.StiffnessValue), & ncEditorData.StiffnessValue, 0, 100);
 
         GuiGroupBox((Rectangle) { anchor01.x + 10, anchor01.y + 320, 280, 270 }, "World");
-        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 340, 150, 16 }, "Gravity", TextFormat("%0.2f", ncEditorData.GravityValue), & ncEditorData.GravityValue, -1, 100);
+        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 340, 150, 16 }, "Gravity", TextFormat("%0.2f", ncEditorData.GravityValue), & ncEditorData.GravityValue, -100, 100);
         GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 380, 150, 16 }, "Gravitation", TextFormat("%0.2f", ncEditorData.GravitationValue), & ncEditorData.GravitationValue, 0, 100);
 
         if (GuiDropdownBox((Rectangle) { anchor01.x + 100, anchor01.y + 50, 150, 20 }, "DYNAMIC;KINEMATIC;STATIC", & ncEditorData.BodyTypeActive, ncEditorData.BodyTypeEditMode)) ncEditorData.BodyTypeEditMode = !ncEditorData.BodyTypeEditMode;

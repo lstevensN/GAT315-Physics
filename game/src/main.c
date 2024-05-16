@@ -6,6 +6,8 @@
 #include "render.h"
 #include "editor.h"
 #include "spring.h"
+#include "contact.h"
+#include "collision.h"
 
 #include <raylib.h>
 #include "raymath.h"
@@ -46,10 +48,10 @@ int main(void)
 		if (selectedBody)
 		{
 			Vector2 screen = ConvertWorldToScreen(selectedBody->position);
-			DrawCircleLines((int)screen.x, (int)screen.y, ConvertWorldToPixel(selectedBody->mass) + 5, YELLOW);
+			DrawCircleLines((int)screen.x, (int)screen.y, ConvertWorldToPixel(selectedBody->mass * 0.5f) + 5, YELLOW);
 		}
 
-		if (!ncEditorIntersect && IsMouseButtonPressed(0))
+		if (!ncEditorIntersect && (IsMouseButtonPressed(0) || IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsKeyDown(KEY_LEFT_SHIFT)))
 		{
 			float angle = GetRandomFloatValue(0, 360);
 			Color color = ColorFromHSV(GetRandomFloatValue(0, 360), 1, 1);
@@ -60,7 +62,8 @@ int main(void)
 
 				body->damping = ncEditorData.DampingValue;
 				body->gravityScale = ncEditorData.GravityScaleValue;
-				body->color = ColorFromHSV(GetRandomFloatValue(0, 360), 1, 1);
+				body->color = WHITE; // ColorFromHSV(GetRandomFloatValue(0, 360), 1, 1);
+				body->restitution = 0.3f;
 
 				AddBody(body);
 			}
@@ -84,6 +87,12 @@ int main(void)
 		// update bodies
 		for (ncBody* body = ncBodies; body; body = body->next) Step(body, dt);
 
+		// collision
+		ncContact_t* contacts = NULL;
+		CreateContacts(ncBodies, &contacts);
+		SeparateContacts(contacts);
+		ResolveContacts(contacts);
+
 		// render
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -98,11 +107,15 @@ int main(void)
 		// draw bodies
 		for (ncBody* body = ncBodies; body; body = body->next)
 		{
-			/*if ((int)body->position.x < 0 || (int)body->position.x > screenX || (int)body->position.y < 0 || (int)body->position.y > screenY) { body = body->prev; DestroyBody(body->next); }
-			else DrawCircle((int)body->position.x, (int)body->position.y, body->mass, body->color);*/
-
 			Vector2 screen = ConvertWorldToScreen(body->position);
-			DrawCircle((int)screen.x, (int)screen.y, body->mass, body->color);
+			DrawCircle((int)screen.x, (int)screen.y, ConvertWorldToPixel(body->mass * 0.5f), body->color);
+		}
+
+		// draw contacts
+		for (ncContact_t* contact = contacts; contact; contact = contact->next)
+		{
+			Vector2 screen = ConvertWorldToScreen(contact->body1->position);
+			DrawCircle((int)screen.x, (int)screen.y, ConvertWorldToPixel(contact->body1->mass * 0.5f), RED);
 		}
 
 		// draw springs
