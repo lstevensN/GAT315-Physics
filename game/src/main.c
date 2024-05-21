@@ -15,12 +15,16 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include <time.h>
+
 #define MAX_BODIES 1000
 
 int main(void)
 {
 	ncBody* selectedBody = NULL;
 	ncBody* connectBody = NULL;
+
+	ncContact_t* contacts = NULL;
 
 	InitWindow(1200, 720, "Physics Engine");
 	InitEditor();
@@ -29,6 +33,7 @@ int main(void)
 	// initialize world
 	int screenX = GetScreenWidth(), screenY = GetScreenHeight();
 	ncScreenZoom = 10;
+	float timeAccumulator = 0;
 
 	// game loop
 	while (!WindowShouldClose())
@@ -69,29 +74,42 @@ int main(void)
 			}
 		}
 
-		if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && selectedBody) connectBody = selectedBody;
-		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && connectBody) DrawLineBodyToPosition(connectBody, position);
-		if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && connectBody)
+		if (IsKeyDown(KEY_LEFT_CONTROL))
 		{
-			if (selectedBody && selectedBody != connectBody)
+			if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && selectedBody) connectBody = selectedBody;
+			if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && connectBody) DrawLineBodyToPosition(connectBody, position);
+			if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && connectBody)
 			{
-				ncSpring_t* spring = CreateSpring(connectBody, selectedBody, Vector2Distance(connectBody->position, selectedBody->position), 20);
-				AddSpring(spring);
+				Vector2 world = ConvertScreenToWorld(position);
+				ApplySpringForcePosition(world, connectBody, 0, 100, 5);
+
+				if (selectedBody && selectedBody != connectBody)
+				{
+					ncSpring_t* spring = CreateSpring(connectBody, selectedBody, Vector2Distance(connectBody->position, selectedBody->position), 20);
+					AddSpring(spring);
+				}
 			}
 		}
 
-		// apply force
-		ApplyGravitation(ncBodies, ncEditorData.GravitationValue);
-		ApplySpringForce(ncSprings);
+		timeAccumulator += dt;
 
-		// update bodies
-		for (ncBody* body = ncBodies; body; body = body->next) Step(body, dt);
+		while (timeAccumulator >= ncEditorData.FixedTimeStepValue)
+		{
+			timeAccumulator -= ncEditorData.FixedTimeStepValue;
 
-		// collision
-		ncContact_t* contacts = NULL;
-		CreateContacts(ncBodies, &contacts);
-		SeparateContacts(contacts);
-		ResolveContacts(contacts);
+			// apply force
+			ApplyGravitation(ncBodies, ncEditorData.GravitationValue);
+			ApplySpringForce(ncSprings);
+
+			// update bodies
+			if (ncEditorData.Simulate) for (ncBody* body = ncBodies; body; body = body->next) Step(body, ncEditorData.FixedTimeStepValue);
+
+			// collision
+			contacts = NULL;
+			CreateContacts(ncBodies, &contacts);
+			SeparateContacts(contacts);
+			ResolveContacts(contacts);
+		}
 
 		// render
 		BeginDrawing();
@@ -124,6 +142,16 @@ int main(void)
 			Vector2 screen1 = ConvertWorldToScreen(spring->body1->position);
 			Vector2 screen2 = ConvertWorldToScreen(spring->body2->position);
 			DrawLine((int)screen1.x, (int)screen1.y, (int)screen2.x, (int)screen2.y, YELLOW);
+		}
+
+		// reset button
+		if (ncEditorData.Reset)
+		{
+			while (ncBodies) DestroyBody(ncBodies);
+			while (ncSprings) DestroySpring(ncSprings);
+
+			// InitEditor();
+			ncEditorData.Reset = false;
 		}
 
 		DrawEditor();

@@ -68,3 +68,23 @@ void ApplySpringForce(ncSpring_t* springs)
 		ApplyForce(spring->body2, Vector2Scale(Vector2Negate(ndirection), force), FM_FORCE);
 	}
 }
+
+void ApplySpringForcePosition(Vector2 position, ncBody* body, float restLength, float k, float damping)
+{
+	if (body == NULL) return;
+
+	Vector2 direction = Vector2Subtract(position, body->position);
+
+	if (direction.x == 0 && direction.y == 0) return;
+
+	float length = Vector2Length(direction);
+	float x = length - restLength;
+	float force = -k * x;
+
+	Vector2 ndirection = Vector2Normalize(direction);
+
+	float dampingForce = damping * Vector2DotProduct(body->velocity, ndirection);
+	float totalForce = force + dampingForce;
+
+	ApplyForce(body, Vector2Scale(ndirection, -totalForce), FM_FORCE);
+}

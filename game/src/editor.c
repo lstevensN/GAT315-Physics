@@ -28,6 +28,10 @@ void InitEditor()
     ncEditorData.DampingValue = 0.0f;
     ncEditorData.GravityScaleValue = 1.0f;
     ncEditorData.StiffnessValue = 0.0f;
+    ncEditorData.FixedTimeStepValue = 0.02f;
+
+    ncEditorData.Simulate = true;
+    ncEditorData.Reset = false;
 
     editorRect = (Rectangle){ anchor01.x + 0, anchor01.y + 0, 304, 616 };
 }
@@ -58,6 +62,10 @@ void DrawEditor()
         GuiGroupBox((Rectangle) { anchor01.x + 10, anchor01.y + 320, 280, 270 }, "World");
         GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 340, 150, 16 }, "Gravity", TextFormat("%0.2f", ncEditorData.GravityValue), & ncEditorData.GravityValue, -100, 100);
         GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 380, 150, 16 }, "Gravitation", TextFormat("%0.2f", ncEditorData.GravitationValue), & ncEditorData.GravitationValue, 0, 100);
+        GuiSliderBar((Rectangle) { anchor01.x + 100, anchor01.y + 410, 150, 16 }, "FPS", TextFormat("%0.002f", ncEditorData.FixedTimeStepValue), & ncEditorData.FixedTimeStepValue, 0.01f, 0.05f);
+
+        GuiToggle((Rectangle) { anchor01.x + 175, anchor01.y + 450, 75, 30 }, "Simulate", &ncEditorData.Simulate);
+        GuiToggle((Rectangle) { anchor01.x + 50, anchor01.y + 450, 75, 30 }, "Reset", &ncEditorData.Reset);
 
         if (GuiDropdownBox((Rectangle) { anchor01.x + 100, anchor01.y + 50, 150, 20 }, "DYNAMIC;KINEMATIC;STATIC", & ncEditorData.BodyTypeActive, ncEditorData.BodyTypeEditMode)) ncEditorData.BodyTypeEditMode = !ncEditorData.BodyTypeEditMode;
     }

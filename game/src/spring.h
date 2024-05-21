@@ -20,3 +20,4 @@ void DestroySpring(ncSpring_t* spring);
 void DestroyAllSprings();
 
 void ApplySpringForce(ncSpring_t* springs);
+void ApplySpringForcePosition(struct Vector2 position, struct ncBody* body, float restLength, float k, float damping);
