@@ -59,7 +59,6 @@ int main(void)
 		if (!ncEditorIntersect && (IsMouseButtonPressed(0) || IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsKeyDown(KEY_LEFT_SHIFT)))
 		{
 			float angle = GetRandomFloatValue(0, 360);
-			Color color = ColorFromHSV(GetRandomFloatValue(0, 360), 1, 1);
 
 			for (int i = 0; i < 1; i++)
 			{
@@ -81,6 +80,9 @@ int main(void)
 			if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && connectBody)
 			{
 				Vector2 world = ConvertScreenToWorld(position);
+
+				if (connectBody->type == BT_STATIC || connectBody->type == BT_KINEMATIC) connectBody->position = world;
+
 				ApplySpringForcePosition(world, connectBody, 0, 100, 5);
 
 				if (selectedBody && selectedBody != connectBody)
@@ -147,8 +149,9 @@ int main(void)
 		// reset button
 		if (ncEditorData.Reset)
 		{
-			while (ncBodies) DestroyBody(ncBodies);
-			while (ncSprings) DestroySpring(ncSprings);
+			DestroyAllBodies();
+			DestroyAllSprings();
+			DestroyAllContacts(&contacts);
 
 			// InitEditor();
 			ncEditorData.Reset = false;
@@ -161,7 +164,9 @@ int main(void)
 
 	CloseWindow();
 
-	while (ncBodies) DestroyBody(ncBodies);
+	DestroyAllBodies();
+	DestroyAllSprings();
+	DestroyAllContacts(&contacts);
 
 	return 0;
 }

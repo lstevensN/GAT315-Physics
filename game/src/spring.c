@@ -48,7 +48,17 @@ void DestroySpring(ncSpring_t* spring)
 
 void DestroyAllSprings()
 {
+	if (!ncSprings) return;
 
+	ncSpring_t* spring = ncSprings;
+	while (spring)
+	{
+		ncSpring_t* next = spring->next;
+		free(spring);
+		spring = next;
+	}
+
+	ncSprings = NULL;
 }
 
 void ApplySpringForce(ncSpring_t* springs)
